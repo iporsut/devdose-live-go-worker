@@ -14,12 +14,12 @@ type worker struct {
 	done     chan struct{}
 }
 
-func sleepContext(ctx context.Context, duration time.Duration) {
+func SleepContext(ctx context.Context, duration time.Duration) {
+	timer := time.NewTimer(duration)
 	select {
 	case <-ctx.Done():
-		return
-	case <-time.After(duration):
-		return
+		timer.Stop()
+	case <-timer.C:
 	}
 }
 
@@ -32,7 +32,7 @@ func (w *worker) Execute(ctx context.Context) {
 			return
 		default:
 			log.Printf("%s: at %s", w.name, time.Now().Format(time.RFC3339))
-			sleepContext(ctx, w.duration)
+			SleepContext(ctx, w.duration)
 		}
 	}
 }
